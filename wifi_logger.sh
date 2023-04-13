@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Name of the Wi-Fi networks log file
-LOG_FILE="/home/pi/wifi_log.txt"
+LOG_FILE="wifi_log.txt"
 
 # Array to store registered SSIDs
 declare -A registered_ssids
@@ -10,11 +10,12 @@ declare -A registered_ssids
 if [[ -e "$LOG_FILE" ]]; then
   # Read the log file and add SSIDs to the registered SSIDs array
   while IFS= read -r line; do
-    # Extract the SSID name from the log file
-    ssid=$(echo "$line" | awk -F': ' '{print $2}')
+    # Extract the SSID name and timestamp from the log file
+    ssid=$(echo "$line" | awk -F' |: ' '{print $2}')
+    timestamp=$(echo "$line" | awk -F' |: ' '{print $3, $4}')
     
-    # Add the SSID to the registered SSIDs array
-    registered_ssids[$ssid]=1
+    # Add the SSID and timestamp to the registered SSIDs array
+    registered_ssids[$ssid]="$timestamp"
   done < "$LOG_FILE"
 fi
 
@@ -30,11 +31,14 @@ while true; do
     
     # Check if the SSID has already been registered
     if [[ ! ${registered_ssids[$ssid]} ]]; then
-      # Log the SSID in the log file
-      echo "SSID: $ssid" >> $LOG_FILE
+      # Get the current timestamp
+      timestamp=$(date "+%Y-%m-%d %H:%M:%S")
       
-      # Add the SSID to the registered SSIDs array
-      registered_ssids[$ssid]=1
+      # Log the SSID with timestamp in the log file
+      echo "SSID: $ssid - Timestamp: $timestamp" >> $LOG_FILE
+      
+      # Add the SSID and timestamp to the registered SSIDs array
+      registered_ssids[$ssid]="$timestamp"
     fi
   done <<< "$iw_output"
   
