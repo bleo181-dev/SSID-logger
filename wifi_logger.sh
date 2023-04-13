@@ -1,43 +1,43 @@
 #!/bin/bash
 
-# Nome del file di log delle reti Wi-Fi
+# Name of the Wi-Fi networks log file
 LOG_FILE="/home/pi/wifi_log.txt"
 
-# Array per memorizzare gli SSID registrati
+# Array to store registered SSIDs
 declare -A registered_ssids
 
-# Verifica se il file di log esiste
+# Check if the log file exists
 if [[ -e "$LOG_FILE" ]]; then
-  # Leggi il file di log e aggiungi gli SSID all'array dei SSID registrati
+  # Read the log file and add SSIDs to the registered SSIDs array
   while IFS= read -r line; do
-    # Estra il nome dell'SSID dal file di log
+    # Extract the SSID name from the log file
     ssid=$(echo "$line" | awk -F': ' '{print $2}')
     
-    # Aggiungi l'SSID all'array dei SSID registrati
+    # Add the SSID to the registered SSIDs array
     registered_ssids[$ssid]=1
   done < "$LOG_FILE"
 fi
 
-# Loop continuo per la registrazione delle reti Wi-Fi
+# Continuous loop for Wi-Fi network logging
 while true; do
-  # Rileva le reti Wi-Fi circostanti
+  # Detect surrounding Wi-Fi networks
   iw_output=$(sudo iw dev wlan0 scan | grep "SSID")
   
-  # Elabora l'output del comando iw
+  # Process the output of the iw command
   while IFS= read -r line; do
-    # Estra il nome dell'SSID
+    # Extract the SSID name
     ssid=$(echo "$line" | awk -F': ' '{print $2}')
     
-    # Verifica se l'SSID è già stato registrato
+    # Check if the SSID has already been registered
     if [[ ! ${registered_ssids[$ssid]} ]]; then
-      # Registra l'SSID nel file di log
+      # Log the SSID in the log file
       echo "SSID: $ssid" >> $LOG_FILE
       
-      # Aggiungi l'SSID all'array dei SSID registrati
+      # Add the SSID to the registered SSIDs array
       registered_ssids[$ssid]=1
     fi
   done <<< "$iw_output"
   
-  # Aggiorna il file di log ogni 5 secondi (opzionale, puoi modificare l'intervallo di tempo secondo le tue preferenze)
+  # Update the log file every 5 seconds (optional, you can modify the time interval according to your preference)
   sleep 5
 done
