@@ -9,13 +9,13 @@ declare -A registered_ssids
 # Function to create the log file if it does not exist
 create_log_file() {
   if [[ ! -e "$LOG_FILE" ]]; then
-    touch "$LOG_FILE"
+    echo "--------- + $(date "+%Y-%m-%d %H:%M:%S") + New SSID logging + --------" > "$LOG_FILE"
   fi
 }
 
 # "Restart" the log file if it exists
 if [[ -s "$LOG_FILE" ]]; then
-  echo "--------- + $(date "+%Y-%m-%d %H:%M:%S") + New SSID logging + --------" > "$LOG_FILE"
+  echo "--------- + $(date "+%Y-%m-%d %H:%M:%S") + New SSID logging + --------" >> "$LOG_FILE"
 fi
 
 # Check if the log file exists
