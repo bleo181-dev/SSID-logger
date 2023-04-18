@@ -2,7 +2,7 @@
 
 **Wi-Fi SSID Logger**
 
-Script that continuously scans the Wi-Fi in its radius and saves the unique SSIDs encountered in a text file.
+Script that continuously scans the Wi-Fi in its radius and saves the unique SSIDs encountered in a text file. The data obtained are also available for easier viewing at [IP]/view_log_file.php
 
 **installation**
 
@@ -10,16 +10,6 @@ Script that continuously scans the Wi-Fi in its radius and saves the unique SSID
 sudo apt update
 sudo apt install iw
 git clone https://github.com/bleo181-dev/SSID-logger.git
-```
-
-after that
-
-```
-crontab -e
-```
-
-and add at the bottom of the crontab file this (change the path to suit your case)
-
-```
-@reboot /bin/bash /path/to/wifi_log.sh
+cd SSID-logger
+./setup.sh
 ```
