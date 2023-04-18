@@ -3,6 +3,8 @@
 # Name of the Wi-Fi networks log file
 LOG_FILE="log_wifi.txt"
 
+WEB_PATH="/var/www/html/"
+
 # Array to store registered SSIDs with timestamps
 declare -A registered_ssids
 
@@ -37,7 +39,7 @@ while true; do
     # Check if the SSID has already been registered
     if [[ ! ${registered_ssids[$ssid]} ]]; then
       # Log the SSID with timestamp in the log file
-      echo "SSID: $ssid - First seen: $current_timestamp" >> "$LOG_FILE"
+      echo "SSID: $ssid -#- First seen: $current_timestamp" >> "$LOG_FILE"
 
       # Update the registered SSID with the current timestamp in the array
       registered_ssids[$ssid]="$current_timestamp"
@@ -46,7 +48,7 @@ while true; do
       previous_timestamp=${registered_ssids[$ssid]}
 
       # Calculate the time duration between the previous and current timestamp
-      time_duration=$(( $(date -d "$current_timestamp" +%s) - $(date -d "$previous_timestamp" +%s) ))
+      time_duration=$(( $(date -d "$current_timestamp" +%s)-$(date -d "$previous_timestamp" +%s) ))
 
       # Update the timestamp for the registered SSID in the array
       registered_ssids[$ssid]="$current_timestamp"
@@ -68,8 +70,11 @@ while true; do
       current_timestamp_formatted=$(date "+%Y-%m-%d %H:%M:%S")
 
       # Update the log file with the updated timestamp and total time duration using sed
-      sed -i "s/SSID: $ssid - Last seen: .*/SSID: $ssid - Last seen: $current_timestamp_formatted - Total time: $total_hours hours $total_minutes minutes $total_seconds seconds/" "$LOG_FILE"
-      sed -i "s/SSID: $ssid - First seen: .*/SSID: $ssid - Last seen: $current_timestamp_formatted - Total time: $total_hours hours $total_minutes minutes $total_seconds seconds/" "$LOG_FILE"
+      sed -i "s/SSID: $ssid -#- Last seen: .*/SSID: $ssid -#- Last seen: $current_timestamp_formatted -#- Total time: $total_hours hours $total_minutes minutes $total_seconds seconds/" "$LOG_FILE"
+      sed -i "s/SSID: $ssid -#- First seen: .*/SSID: $ssid -#- Last seen: $current_timestamp_formatted -#- Total time: $total_hours hours $total_minutes minutes $total_seconds seconds/" "$LOG_FILE"
+    
+      # Copy the log file to the folder where the php log reader is
+      cp "$LOG_FILE" "$WEB_PATH"
     fi
 
     # Check if the log file still exists, recreate it if it's deleted
